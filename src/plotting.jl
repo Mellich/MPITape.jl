@@ -45,7 +45,11 @@ function _generate_plantuml(edges)
     str_edge = ""
     sorted_edges = sort(edges; by = e -> max(e[1].t_end, e[2].t_end))
     for (s, d) in sorted_edges
-        str_edge *= "Rank_$(s.rank) -> Rank_$(d.rank) : $(string(s.f))\n"
+        sender_name = replace(string(s.f), "MPI_" => "")
+        destination_name = replace(string(d.f), "MPI_" => "")
+        sender_str = "$(sender_name)$(string(s.args_subset))"
+        destination_str = "$(destination_name)$(string(d.args_subset))"
+        str_edge *= "Rank_$(s.rank) -> Rank_$(d.rank) : $sender_str -> $destination_str\n"
     end
     return str_edge
 end
@@ -56,35 +60,35 @@ Plot a sequence diagram of the communication between ranks using the communicati
 
 Creates a plot of the following form using Kroki.jl:
 
-┌──────┐          ┌──────┐          ┌──────┐          ┌──────┐          ┌──────┐
-│Rank_0│          │Rank_1│          │Rank_2│          │Rank_3│          │Rank_4│
-└──┬───┘          └──┬───┘          └──┬───┘          └──┬───┘          └──┬───┘
-   │     MPI_Send    │                 │                 │                 │    
-   │ ────────────────>                 │                 │                 │    
-   │                 │                 │                 │                 │      
-   │              MPI_Send             │                 │                 │    
-   │ ──────────────────────────────────>                 │                 │    
-   │                 │                 │                 │                 │    
-   │                 │     MPI_Send    │                 │                 │    
-   │ ────────────────────────────────────────────────────>                 │                
-   │                 │                 │                 │                 │    
-   │                 │              MPI_Send             │                 │    
-   │ ──────────────────────────────────────────────────────────────────────>       
-   │                 │                 │                 │                 │    
-   │     MPI_Send    │                 │                 │                 │    
-   │ <────────────────                 │                 │                 │    
-   │                 │                 │                 │                 │    
-   │              MPI_Send             │                 │                 │    
-   │ <──────────────────────────────────                 │                 │    
-   │                 │                 │                 │                 │    
-   │                 │     MPI_Send    │                 │                 │    
-   │ <────────────────────────────────────────────────────                 │    
-   │                 │                 │                 │                 │    
-   │                 │              MPI_Send             │                 │    
-   │ <──────────────────────────────────────────────────────────────────────    
-┌──┴───┐          ┌──┴───┐          ┌──┴───┐          ┌──┴───┐          ┌──┴───┐
-│Rank_0│          │Rank_1│          │Rank_2│          │Rank_3│          │Rank_4│
-└──────┘          └──────┘          └──────┘          └──────┘          └──────┘
+    ┌──────┐          ┌──────┐          ┌──────┐          ┌──────┐          ┌──────┐
+    │Rank_0│          │Rank_1│          │Rank_2│          │Rank_3│          │Rank_4│
+    └──┬───┘          └──┬───┘          └──┬───┘          └──┬───┘          └──┬───┘
+       │     MPI_Send    │                 │                 │                 │    
+       │ ────────────────>                 │                 │                 │    
+       │                 │                 │                 │                 │      
+       │              MPI_Send             │                 │                 │    
+       │ ──────────────────────────────────>                 │                 │    
+       │                 │                 │                 │                 │    
+       │                 │     MPI_Send    │                 │                 │    
+       │ ────────────────────────────────────────────────────>                 │                
+       │                 │                 │                 │                 │    
+       │                 │              MPI_Send             │                 │    
+       │ ──────────────────────────────────────────────────────────────────────>       
+       │                 │                 │                 │                 │    
+       │     MPI_Send    │                 │                 │                 │    
+       │ <────────────────                 │                 │                 │    
+       │                 │                 │                 │                 │    
+       │              MPI_Send             │                 │                 │    
+       │ <──────────────────────────────────                 │                 │    
+       │                 │                 │                 │                 │    
+       │                 │     MPI_Send    │                 │                 │    
+       │ <────────────────────────────────────────────────────                 │    
+       │                 │                 │                 │                 │    
+       │                 │              MPI_Send             │                 │    
+       │ <──────────────────────────────────────────────────────────────────────    
+    ┌──┴───┐          ┌──┴───┐          ┌──┴───┐          ┌──┴───┐          ┌──┴───┐
+    │Rank_0│          │Rank_1│          │Rank_2│          │Rank_3│          │Rank_4│
+    └──────┘          └──────┘          └──────┘          └──────┘          └──────┘
 """
 function plot_sequence_merged(tape)
     edges = get_edges(tape)

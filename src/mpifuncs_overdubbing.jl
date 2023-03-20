@@ -8,14 +8,14 @@
 
 const MPIFunctions = [
     MPI.API.MPI_Init => (),
-    MPI.API.MPI_Send => (:rank, :(args[4])),
-    MPI.API.MPI_Isend => (:rank, :(args[4])),
-    MPI.API.MPI_Recv => (:(args[4]), :rank),
-    MPI.API.MPI_Irecv => (:(args[4]), :rank),
-    MPI.API.MPI_Sendrecv => (:(args[9]), :(args[4])),
-    MPI.API.MPI_Isendrecv => (:(args[9]), :(args[4])),
-    MPI.API.MPI_Bcast => (:(args[4]), "all"),
-    MPI.API.MPI_Ibcast => (:(args[4]), "all"),
+    MPI.API.MPI_Send => (:rank, :(args[4]), :(args[5])),
+    MPI.API.MPI_Isend => (:rank, :(args[4]), :(args[5])),
+    MPI.API.MPI_Recv => (:(args[4]), :rank, :(args[5])),
+    MPI.API.MPI_Irecv => (:(args[4]), :rank, :(args[5])),
+    MPI.API.MPI_Sendrecv => (:(args[9]), :(args[4]), :(args[5])),
+    MPI.API.MPI_Isendrecv => (:(args[9]), :(args[4]), :(args[5])),
+    MPI.API.MPI_Bcast => (:(args[4]), "all", :(args[5])),
+    MPI.API.MPI_Ibcast => (:(args[4]), "all", :(args[5])),
     MPI.API.MPI_Gather => ("each", :(args[7])),
     MPI.API.MPI_Gatherv => ("each", :(args[8])),
     MPI.API.MPI_Igather => ("each", :(args[7])),
@@ -72,6 +72,12 @@ for (mpifunc, srcdest) in MPIFunctions
         dest = srcdest[2]
         args_quote = quote
             argvals = (; src = $(src), dest = $(dest))
+        end
+        if length(srcdest) > 2
+            tag = srcdest[3]
+            args_quote = quote
+                argvals = (; src = $(src), dest = $(dest), tag = $(tag))
+            end
         end
     end
 
