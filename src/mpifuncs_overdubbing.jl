@@ -101,7 +101,8 @@ for (mpifunc, srcdest) in MPIFunctions
                                 argtypes,
                                 argvals,
                                 ctx.metadata.start_time,
-                                MPI.Wtime() - TIME_START[]))
+                                MPI.Wtime() - TIME_START[],
+                                stacktrace(backtrace())))
                  return nothing
              end
          end)
